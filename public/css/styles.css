@@ -1,0 +1,401 @@
+/* Robot Simulation Module Styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    overflow: hidden;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Header */
+header {
+    background-color: #2d2d2d;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #404040;
+}
+
+header h1 {
+    color: #00ff88;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.connection-status {
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+#connectionStatus {
+    color: #ff4444;
+}
+
+#connectionStatus.connected {
+    color: #00ff88;
+}
+
+/* Main Container */
+.main-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* 3D Visualization Panel */
+.visualization-panel {
+    flex: 2;
+    position: relative;
+    background-color: #0a0a0a;
+    border-right: 2px solid #404040;
+}
+
+#threejs-container {
+    width: 100%;
+    height: 100%;
+}
+
+.view-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+}
+
+.view-controls button {
+    padding: 8px 12px;
+    background-color: rgba(45, 45, 45, 0.8);
+    border: 1px solid #666;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.view-controls button:hover {
+    background-color: rgba(45, 45, 45, 1);
+    border-color: #00ff88;
+}
+
+/* Control Panel */
+.control-panel {
+    flex: 1;
+    background-color: #2d2d2d;
+    padding: 20px;
+    overflow-y: auto;
+    min-width: 300px;
+}
+
+.panel-section {
+    margin-bottom: 25px;
+    border: 1px solid #404040;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: #353535;
+}
+
+.panel-section h3 {
+    color: #00ff88;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    border-bottom: 1px solid #404040;
+    padding-bottom: 5px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.control-group label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.control-group input[type="number"] {
+    width: 80px;
+    padding: 5px;
+    border: 1px solid #666;
+    border-radius: 4px;
+    background-color: #1a1a1a;
+    color: white;
+}
+
+/* Position Controls */
+.position-sliders {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #404040;
+}
+
+.position-control {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
+.position-control label {
+    font-size: 0.9em;
+    color: #cccccc;
+}
+
+/* Joint Controls */
+.joint-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.joint-control {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.joint-control label {
+    font-size: 0.9em;
+    color: #cccccc;
+}
+
+.joint-control input[type="range"] {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: #666;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.joint-control input[type="range"]:hover {
+    opacity: 1;
+}
+
+.joint-control input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #00ff88;
+    cursor: pointer;
+}
+
+.joint-control input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #00ff88;
+    cursor: pointer;
+    border: none;
+}
+
+/* Gripper Controls */
+.gripper-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Buttons */
+.btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    background-color: #404040;
+    color: white;
+}
+
+.btn:hover {
+    background-color: #505050;
+    transform: translateY(-1px);
+}
+
+.btn.primary {
+    background-color: #0066cc;
+}
+
+.btn.primary:hover {
+    background-color: #0080ff;
+}
+
+.btn.danger {
+    background-color: #cc0000;
+}
+
+.btn.danger:hover {
+    background-color: #ff0000;
+}
+
+.btn:disabled {
+    background-color: #666;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Status Display */
+.status-display {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid #404040;
+}
+
+.status-item:last-child {
+    border-bottom: none;
+}
+
+.status-item label {
+    font-weight: bold;
+    color: #cccccc;
+}
+
+.status-item span {
+    color: #00ff88;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+/* Log Panel */
+.log-panel {
+    height: 150px;
+    background-color: #1a1a1a;
+    border-top: 2px solid #404040;
+    padding: 10px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.log-panel h3 {
+    color: #00ff88;
+    margin-bottom: 10px;
+    font-size: 1em;
+}
+
+#eventLog {
+    flex: 1;
+    background-color: #0a0a0a;
+    border: 1px solid #404040;
+    border-radius: 4px;
+    padding: 10px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8em;
+    line-height: 1.4;
+}
+
+#clearLog {
+    align-self: flex-end;
+    margin-top: 5px;
+    padding: 5px 10px;
+    font-size: 0.8em;
+}
+
+/* Log Entry Styles */
+.log-entry {
+    margin-bottom: 3px;
+    padding: 2px 0;
+}
+
+.log-entry.info {
+    color: #00ff88;
+}
+
+.log-entry.warning {
+    color: #ffaa00;
+}
+
+.log-entry.error {
+    color: #ff4444;
+}
+
+.log-entry .timestamp {
+    color: #666;
+    margin-right: 10px;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #404040;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #505050;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .main-container {
+        flex-direction: column;
+    }
+
+    .visualization-panel {
+        height: 60vh;
+        border-right: none;
+        border-bottom: 2px solid #404040;
+    }
+
+    .control-panel {
+        height: 40vh;
+        min-width: unset;
+    }
+}
+
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.2em;
+    }
+
+    .control-panel {
+        padding: 15px;
+    }
+
+    .panel-section {
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+
+    .joint-controls {
+        gap: 10px;
+    }
+}

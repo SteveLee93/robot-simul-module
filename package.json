@@ -1,0 +1,23 @@
+{
+  "name": "robot-simulation-module",
+  "version": "1.0.0",
+  "description": "Hardware-agnostic robot simulation module with 3D visualization",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "test": "node --test test/*.test.js",
+    "serve": "npx http-server . -p 8080 -c-1"
+  },
+  "keywords": ["robot", "simulation", "3d", "visualization", "mock", "hardware"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
