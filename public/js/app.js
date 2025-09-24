@@ -1,4 +1,4 @@
-import { RobotVisualizer } from './RobotVisualizer.js';
+import { RobotVisualizer } from './robot-visualizer/index.js';
 
 /**
  * 간단한 테스트용 앱

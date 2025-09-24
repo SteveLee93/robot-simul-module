@@ -435,8 +435,8 @@ export class RobotVisualizer {
     updatePositionDisplay() {
         const positionDiv = document.getElementById('position-display');
         if (positionDiv && this.j1) {
-            // J1 조인트의 현재 회전각 (Y축 중심, XY 평면에서 회전)
-            const j1Angle = (this.j1.rotation.y * 180 / Math.PI).toFixed(1);
+            // J1 조인트의 현재 회전각 (Z축 중심, XY 평면에서 회전)
+            const j1Angle = (this.j1.rotation.z * 180 / Math.PI).toFixed(1);
 
             // J2 조인트의 현재 회전각 (Z축 중심 회전)
             const j2Angle = this.j2Joint ? (this.j2Joint.rotation.z * 180 / Math.PI).toFixed(1) : '0.0';
@@ -483,8 +483,8 @@ export class RobotVisualizer {
     // J1 회전 함수 (XY 평면에서 회전, Z축 중심)
     rotateJ1(angle) {
         if (this.j1) {
-            // J1이 XY 평면에 눕혀져 있으므로 Y축을 중심으로 회전해야 함
-            this.j1.rotation.y = angle * Math.PI / 180;
+            // J1이 XY 평면에 눕혀져 있으므로 Z축을 중심으로 회전해야 함
+            this.j1.rotation.z = angle * Math.PI / 180;
             this.updatePositionDisplay();
         }
     }
@@ -493,7 +493,7 @@ export class RobotVisualizer {
     animateJ1To(targetAngle, duration = 1000) {
         if (!this.j1) return;
 
-        const startAngle = this.j1.rotation.y * 180 / Math.PI;
+        const startAngle = this.j1.rotation.z * 180 / Math.PI;
         const startTime = Date.now();
 
         const animate = () => {
@@ -700,7 +700,7 @@ export class RobotVisualizer {
     getEndEffectorPosition() {
         if (!this.j1) return { x: 0, y: 0, z: 0 };
 
-        const j1Angle = this.j1.rotation.y; // Y축 중심 회전 (XY 평면에서)
+        const j1Angle = this.j1.rotation.z; // Z축 중심 회전 (XY 평면에서)
         const j2Angle = this.j2Joint ? this.j2Joint.rotation.x : 0; // X축 중심 회전 (피치)
 
         // J1 링크 길이와 높이
