@@ -242,7 +242,7 @@ export class RobotVisualizer {
 
         const j2LinkCylinder = new THREE.Mesh(
             new THREE.CylinderGeometry(15, 15, 20, 16),
-            new THREE.MeshPhongMaterial({ color: 0xff4444 }) // 주황색
+            new THREE.MeshPhongMaterial({ color: 0xff4444 }) // 빨간색
         );
         j2LinkCylinder.position.set(0, 140, -15);
         j2LinkCylinder.rotateX(Math.PI / 2); // Y축 방향으로 뻗어나감
@@ -277,7 +277,7 @@ export class RobotVisualizer {
         // J3에 연결된 링크 (Y축 방향으로 뻗어나감)
         const j3LinkGeometry = new THREE.CylinderGeometry(10, 10, 30, 16);
         const j3LinkMaterial = new THREE.MeshPhongMaterial({
-            color: 0xff4444 // 청록색
+            color: 0xff4444 // 빨간색
         });
 
         const j3Link = new THREE.Mesh(j3LinkGeometry, j3LinkMaterial);
@@ -295,7 +295,7 @@ export class RobotVisualizer {
         // J4 회전 조인트 (J1처럼 XY 평면에서 회전)
         const j4JointGeometry = new THREE.CylinderGeometry(10, 10, 20, 16);
         const j4JointMaterial = new THREE.MeshPhongMaterial({
-            color: 0x4444ff // 노란색
+            color: 0x4444ff // 파란색
         });
 
         const j4JointCylinder = new THREE.Mesh(j4JointGeometry, j4JointMaterial);
@@ -306,7 +306,7 @@ export class RobotVisualizer {
         // J4에 연결된 링크 (Z축 방향으로 뻗어나감)
         const j4LinkGeometry = new THREE.CylinderGeometry(8, 8, 15, 16);
         const j4LinkMaterial = new THREE.MeshPhongMaterial({
-            color: 0xff4444 // 자주색
+            color: 0xff4444 // 빨간색
         });
 
         const j4Link = new THREE.Mesh(j4LinkGeometry, j4LinkMaterial);
@@ -325,7 +325,7 @@ export class RobotVisualizer {
         // J5 회전 조인트 (J2와 같은 방향, Z축 중심 회전)
         const j5JointGeometry = new THREE.CylinderGeometry(8, 8, 15, 16);
         const j5JointMaterial = new THREE.MeshPhongMaterial({
-            color: 0x4444ff // 초록색
+            color: 0x4444ff // 파란색
         });
 
         const j5JointCylinder = new THREE.Mesh(j5JointGeometry, j5JointMaterial);
@@ -337,7 +337,7 @@ export class RobotVisualizer {
         // J5에 연결된 링크 (Y축 방향으로 뻗어나감)
         const j5LinkGeometry = new THREE.CylinderGeometry(6, 6, 25, 16);
         const j5LinkMaterial = new THREE.MeshPhongMaterial({
-            color: 0xff4444 // 시안색
+            color: 0xff4444 // 빨간색
         });
 
         const j5Link = new THREE.Mesh(j5LinkGeometry, j5LinkMaterial);
@@ -387,7 +387,7 @@ export class RobotVisualizer {
         // 그리퍼 핑거들
         const fingerGeometry = new THREE.BoxGeometry(2, 8, 1);
         const fingerMaterial = new THREE.MeshPhongMaterial({
-            color: 0xffffff // 진한 회색
+            color: 0xffffff // 흰색
         });
 
         const leftFinger = new THREE.Mesh(fingerGeometry, fingerMaterial);
@@ -441,7 +441,7 @@ export class RobotVisualizer {
             // J2 조인트의 현재 회전각 (Z축 중심 회전)
             const j2Angle = this.j2Joint ? (this.j2Joint.rotation.z * 180 / Math.PI).toFixed(1) : '0.0';
 
-            // J3 조인트의 현재 회전각 (Y축 중심 회전)
+            // J3 조인트의 현재 회전각 (Z축 중심 회전)
             const j3Angle = this.j3Joint ? (this.j3Joint.rotation.z * 180 / Math.PI).toFixed(1) : '0.0';
 
             // J4 조인트의 현재 회전각 (Y축 중심 회전)
@@ -465,7 +465,7 @@ export class RobotVisualizer {
                 <div>J2 각도: ${j2Angle}°</div>
                 <div>J2 회전: Z축 중심</div>
                 <div>J3 각도: ${j3Angle}°</div>
-                <div>J3 회전: Y축 중심</div>
+                <div>J3 회전: Z축 중심</div>
                 <div>J4 각도: ${j4Angle}°</div>
                 <div>J4 회전: Y축 중심</div>
                 <div>J5 각도: ${j5Angle}°</div>
@@ -516,10 +516,10 @@ export class RobotVisualizer {
         animate();
     }
 
-    // J2 회전 함수 (X축을 중심으로 회전, 피치 움직임)
+    // J2 회전 함수 (Z축을 중심으로 회전)
     rotateJ2(angle) {
         if (this.j2Joint) {
-            // J2는 X축을 중심으로 회전 (피치 회전)
+            // J2는 Z축을 중심으로 회전
             this.j2Joint.rotation.z = angle * Math.PI / 180;
             this.updatePositionDisplay();
         }
@@ -529,7 +529,7 @@ export class RobotVisualizer {
     animateJ2To(targetAngle, duration = 1000) {
         if (!this.j2Joint) return;
 
-        const startAngle = this.j2Joint.rotation.x * 180 / Math.PI;
+        const startAngle = this.j2Joint.rotation.z * 180 / Math.PI;
         const startTime = Date.now();
 
         const animate = () => {
@@ -552,10 +552,10 @@ export class RobotVisualizer {
         animate();
     }
 
-    // J3 회전 함수 (Y축을 중심으로 회전)
+    // J3 회전 함수 (Z축을 중심으로 회전)
     rotateJ3(angle) {
         if (this.j3Joint) {
-            // J3는 Y축을 중심으로 회전
+            // J3는 Z축을 중심으로 회전
             this.j3Joint.rotation.z = angle * Math.PI / 180;
             this.updatePositionDisplay();
         }
@@ -565,7 +565,7 @@ export class RobotVisualizer {
     animateJ3To(targetAngle, duration = 1000) {
         if (!this.j3Joint) return;
 
-        const startAngle = this.j3Joint.rotation.x * 180 / Math.PI;
+        const startAngle = this.j3Joint.rotation.z * 180 / Math.PI;
         const startTime = Date.now();
 
         const animate = () => {
@@ -588,10 +588,10 @@ export class RobotVisualizer {
         animate();
     }
 
-    // J4 회전 함수 (Z축을 중심으로 회전)
+    // J4 회전 함수 (Y축을 중심으로 회전)
     rotateJ4(angle) {
         if (this.j4Joint) {
-            // J4는 Z축을 중심으로 회전
+            // J4는 Y축을 중심으로 회전
             this.j4Joint.rotation.y = angle * Math.PI / 180;
             this.updatePositionDisplay();
         }
@@ -601,7 +601,7 @@ export class RobotVisualizer {
     animateJ4To(targetAngle, duration = 1000) {
         if (!this.j4Joint) return;
 
-        const startAngle = this.j4Joint.rotation.x * 180 / Math.PI;
+        const startAngle = this.j4Joint.rotation.y * 180 / Math.PI;
         const startTime = Date.now();
 
         const animate = () => {
