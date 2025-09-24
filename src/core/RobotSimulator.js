@@ -42,6 +42,8 @@ export class RobotSimulator {
 
     // Calculate initial position from home joint angles
     const initialPose = this.calculateForwardKinematics(this.config.initJointAngles);
+    console.log('Initial Joint Angles:', this.config.initJointAngles);
+    console.log('Initial Pose (FK):', initialPose);
 
     this.state = {
       // Joint angles in degrees
@@ -78,15 +80,15 @@ export class RobotSimulator {
     // Convert degrees to radians
     const rad = joints.map(angle => angle * Math.PI / 180);
 
-    // DH Parameters based on actual 3D model structure
-    // [a, alpha, d, theta_offset]
+    // DH Parameters corrected for proper coordinate system
+    // [a, alpha, d, theta_offset] - Standard DH convention
     const dhParams = [
-      [0,     0,     60,    0],     // Joint 1: Base to Joint1 (Z=60)
-      [0,     Math.PI/2, 40,   -Math.PI/2], // Joint 2: Joint1 to Joint2 (Z=100-60=40)
-      [200,   0,     0,     0],     // Joint 3: Upper arm length (Link2 = 200)
-      [0,     Math.PI/2, 150,   0],     // Joint 4: Joint2 to Joint4 (Z=200-50=150)
-      [0,     -Math.PI/2, 40,    0],     // Joint 5: Joint4 to Joint5 (40 length)
-      [0,     0,     70,    0]      // Joint 6: Joint5 to End-effector (30+40=70)
+      [0,     0,     75,    0],     // Joint 1: Base rotation
+      [0,     Math.PI/2, 0,   Math.PI/2], // Joint 2: Shoulder rotation
+      [200,   0,     0,     0],     // Joint 3: Elbow (upper arm)
+      [0,     Math.PI/2, 200,   0],     // Joint 4: Wrist 1 (forearm)
+      [0,     -Math.PI/2, 0,    0],     // Joint 5: Wrist 2
+      [0,     0,     70,    0]      // Joint 6: Wrist 3 to end-effector
     ];
 
     // Initialize transformation matrix as identity
@@ -394,60 +396,96 @@ export class RobotSimulator {
    * Calculate inverse kinematics using geometric approach
    * Solves for joint angles to reach target position
    */
-  calculateInverseKinematics(position) {
-    // Robot geometry parameters (matching DH parameters and 3D model)
-    const d1 = 60;   // Base to joint 1 (Z=60)
+  calculateInverseKinematics(position, orientation = null, config = { elbow: 'up' }) {
+    // Robot geometry parameters (SO-ARM101 기준)
+    const d1 = 60;   // Base height
     const d2 = 40;   // Joint 1 to joint 2 offset
-    const a3 = 200;  // Upper arm length (Link2 = 200)
-    const d4 = 150;  // Joint 2 to joint 4
-    const d6 = 70;   // Joint 5 to end-effector
+    const a3 = 200;  // Upper arm length
+    const d4 = 150;  // Forearm length
+    const d6 = 70;   // End-effector offset
 
     const { x, y, z } = position;
+
+    // Default orientation (pointing down)
+    const default_orientation = {
+      roll: 0,
+      pitch: Math.PI / 2,  // Pointing down
+      yaw: 0
+    };
+
+    const orient = orientation || default_orientation;
 
     // Joint 1: Base rotation
     const theta1 = Math.atan2(y, x);
 
-    // Calculate wrist center position (subtract end-effector offset)
-    const wrist_x = x - d6 * Math.cos(theta1);
-    const wrist_y = y - d6 * Math.sin(theta1);
-    const wrist_z = z;
+    // Calculate wrist center position
+    // 단순화된 버전: 엔드이펙터가 아래를 향한다고 가정
+    const wrist_x = x - d6 * Math.cos(theta1) * Math.cos(orient.pitch);
+    const wrist_y = y - d6 * Math.sin(theta1) * Math.cos(orient.pitch);
+    const wrist_z = z - d6 * Math.sin(orient.pitch);
 
-    // Distance from base to wrist center
+    // Distance calculations
     const r = Math.sqrt(wrist_x * wrist_x + wrist_y * wrist_y);
     const s = wrist_z - d1 - d2;
-
-    // Distance from joint 2 to wrist center
     const D = Math.sqrt(r * r + s * s);
 
-    // Joint 3: Elbow angle using law of cosines
-    const cos_theta3 = (a3 * a3 + d4 * d4 - D * D) / (2 * a3 * d4);
+    // Workspace validation
+    const max_reach = a3 + d4;
+    const min_reach = Math.abs(a3 - d4);
 
-    // Check if position is reachable
-    if (Math.abs(cos_theta3) > 1) {
-      // Position unreachable, return safe configuration
-      return [
-        theta1 * 180 / Math.PI,
-        0,  // Shoulder straight
-        0,  // Elbow straight
-        0,  // Wrist 1
-        0,  // Wrist 2
-        0   // Wrist 3
-      ];
+    if (D > max_reach) {
+      console.warn(`위치 도달 불가: 거리 ${D.toFixed(1)}mm > 최대 도달거리 ${max_reach}mm`);
+      return null;
     }
 
-    const theta3 = Math.acos(cos_theta3);
+    if (D < min_reach) {
+      console.warn(`위치 도달 불가: 거리 ${D.toFixed(1)}mm < 최소 도달거리 ${min_reach}mm`);
+      return null;
+    }
+
+    // Joint 3: Elbow angle
+    const cos_theta3 = (a3 * a3 + d4 * d4 - D * D) / (2 * a3 * d4);
+
+    // 수치 오차 처리
+    if (Math.abs(cos_theta3) > 1) {
+      if (Math.abs(cos_theta3) - 1 < 1e-6) {
+        // 수치 오차로 인한 경우 클램핑
+        cos_theta3 = Math.sign(cos_theta3);
+      } else {
+        console.warn(`위치 도달 불가: cos(θ3) = ${cos_theta3.toFixed(3)}`);
+        return null;
+      }
+    }
+
+    const theta3_positive = Math.acos(cos_theta3);      // Elbow up
+    const theta3_negative = -Math.acos(cos_theta3);     // Elbow down
+
+    // 엘보우 구성 선택
+    const theta3 = config.elbow === 'down' ? theta3_negative : theta3_positive;
 
     // Joint 2: Shoulder angle
     const alpha = Math.atan2(s, r);
     const beta = Math.acos((a3 * a3 + D * D - d4 * d4) / (2 * a3 * D));
-    const theta2 = alpha + beta;
 
-    // For simplicity, set wrist joints to maintain end-effector orientation
+    // 부호는 로봇의 DH 파라미터와 좌표계에 따라 조정 필요
+    const theta2 = alpha - beta;
+
+    // 간단한 손목 각도 계산 (엔드이펙터를 아래로 향하게)
     const theta4 = 0;  // Wrist 1
-    const theta5 = -(theta2 + theta3 - Math.PI/2); // Wrist 2 (keep end-effector pointing down)
+    const theta5 = -(theta2 + theta3 - Math.PI / 2); // Wrist 2 
     const theta6 = 0;  // Wrist 3
 
-    return [
+    // 조인트 한계 체크 (SO-ARM101 기준, 필요시 조정)
+    const joint_limits = [
+      [-180, 180],  // θ1
+      [-90, 90],    // θ2
+      [-150, 150],  // θ3
+      [-180, 180],  // θ4
+      [-120, 120],  // θ5
+      [-360, 360]   // θ6
+    ];
+
+    const angles_deg = [
       theta1 * 180 / Math.PI,
       theta2 * 180 / Math.PI,
       theta3 * 180 / Math.PI,
@@ -455,6 +493,22 @@ export class RobotSimulator {
       theta5 * 180 / Math.PI,
       theta6 * 180 / Math.PI
     ];
+
+    // 조인트 한계 검증
+    for (let i = 0; i < angles_deg.length; i++) {
+      const angle = angles_deg[i];
+      const [min_limit, max_limit] = joint_limits[i];
+
+      if (angle < min_limit || angle > max_limit) {
+        console.warn(`조인트 ${i + 1} 한계 초과: ${angle.toFixed(1)}° (범위: ${min_limit}°~${max_limit}°)`);
+
+        // 옵션: 클램핑 또는 null 반환
+        // angles_deg[i] = Math.max(min_limit, Math.min(max_limit, angle));
+        return null;
+      }
+    }
+
+    return angles_deg;
   }
 
   /**
